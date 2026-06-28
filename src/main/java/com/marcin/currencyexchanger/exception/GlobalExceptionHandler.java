@@ -4,6 +4,7 @@ import com.marcin.currencyexchanger.exchange.exception.ExchangeException;
 import com.marcin.currencyexchanger.nbp.exception.CurrencyNotFoundException;
 import com.marcin.currencyexchanger.nbp.exception.NbpException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,25 +18,28 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+            ConstraintViolationException ex,
+            HttpServletRequest request) {
+        Map<String, String> errors = new HashMap<>();
+
+        ex.getConstraintViolations().forEach((violation) -> errors.put(violation.getPropertyPath().toString(), violation.getMessage()));
+
+        return sendResponse(errors, HttpStatus.BAD_REQUEST, request.getRequestURI());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException ex,
             HttpServletRequest request) {
-        Map<String, String> errors = new HashMap();
+        Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach((fieldError) -> {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         });
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                ex.getStatusCode(),
-                ex.getStatusCode().value(),
-                errors,
-                request.getRequestURI()
-        );
-
-        return new ResponseEntity<>(errorResponse, ex.getStatusCode());
+        return sendResponse(errors, HttpStatus.BAD_REQUEST, request.getRequestURI());
     }
 
     @ExceptionHandler(MissingPathVariableException.class)
@@ -43,7 +47,7 @@ public class GlobalExceptionHandler {
             MissingPathVariableException ex,
             HttpServletRequest request
     ) {
-        Map<String, String> errors = new HashMap();
+        Map<String, String> errors = new HashMap<>();
 
         errors.put(ex.getVariableName(), ex.getMessage());
 
@@ -55,7 +59,7 @@ public class GlobalExceptionHandler {
             NbpException ex,
             HttpServletRequest request
     ) {
-        Map<String, String> errors = new HashMap();
+        Map<String, String> errors = new HashMap<>();
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
         errors.put("error", ex.getMessage());
@@ -81,7 +85,7 @@ public class GlobalExceptionHandler {
             CurrencyNotFoundException ex,
             HttpServletRequest request
     ) {
-        Map<String, String> errors = new HashMap();
+        Map<String, String> errors = new HashMap<>();
         HttpStatus status = HttpStatus.NOT_FOUND;
         errors.put("error", ex.getMessage());
 
