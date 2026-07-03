@@ -16,6 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api")
 @Validated
 public class ExchangeController {
 
