@@ -36,7 +36,7 @@ public class JwtTokenService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        log.info("Generating token for user {}", userDetails.getUsername());
+//        log.info("Generating token for user {}", userDetails.getUsername());
 
         Map<String, Object> claims = new HashMap<>();
 
@@ -58,7 +58,7 @@ public class JwtTokenService {
     }
 
     public String getUsernameFromToken(String token) {
-        log.info("Extracting username from token: {}", token);
+//        log.info("Extracting username from token: {}", token);
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
@@ -68,14 +68,14 @@ public class JwtTokenService {
     }
 
     public boolean validateToken(String token) {
-        log.info("Validating token: {}", token);
+//        log.info("Validating token: {}", token);
         try {
-            Jwts.parser().verifyWith(secretKey).build().parseClaimsJws(token);
-            log.info("Token is valid: {}", token);
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+//            log.info("Token is valid: {}", token);
             return true;
         }
         catch (Exception e) {
-            log.warn("Invalid token: {}", token);
+//            log.warn("Invalid token: {}", token);
             return false;
         }
     }

@@ -1,5 +1,7 @@
 package com.marcin.currencyexchanger.role;
 
+import com.marcin.currencyexchanger.role.exception.RoleAlreadyExistsException;
+import com.marcin.currencyexchanger.role.exception.RoleNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,14 +13,25 @@ public class RoleService {
         saveRoles();
     }
 
+    public Role findByName(RoleEnum name) {
+        return roleRepository.findByName(name).orElseThrow(() -> new RoleNotFoundException("Role " + name + " not found"));
+    }
+
+    public boolean existsByName(RoleEnum name) {
+        return roleRepository.existsByName(name);
+    }
+
     private void saveRoles() {
         this.saveRole(RoleEnum.ADMIN);
         this.saveRole(RoleEnum.USER);
     }
 
-    private void saveRole(RoleEnum name) {
-        if (!roleRepository.existsByName(name)) {
-            roleRepository.save(new Role(name));
+    private void saveRole(RoleEnum role) {
+        if (!this.existsByName(role)) {
+            roleRepository.save(new Role(role));
+        }
+        else {
+            throw new RoleAlreadyExistsException(role);
         }
     }
 }
