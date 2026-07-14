@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class ExchangeController {
     private final NbpService nbpService;
 
     @PostMapping("/exchange")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<ExchangeResponse> exchangeCurrency(@Valid @RequestBody ExchangeRequest exchangeRequest) {
         ExchangeResponse exchangeResponse = exchangeService.exchangeCurrency(exchangeRequest);
 
@@ -32,11 +34,13 @@ public class ExchangeController {
     }
 
     @GetMapping("/currencies")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<List<Currency>> getCurrencies() {
         return new ResponseEntity<>(nbpService.getAllCurrenciesFromCache(), HttpStatus.OK);
     }
 
     @GetMapping("/currency")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Currency> getCurrency(
             @RequestParam("code")
             @Pattern(regexp = "^[A-Z]{3}$", message = "Currency code must consist of exactly 3 uppercase letters")

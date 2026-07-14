@@ -10,7 +10,6 @@ public class RoleService {
 
     public RoleService(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
-        saveRoles();
     }
 
     public Role findByName(RoleEnum name) {
@@ -22,8 +21,8 @@ public class RoleService {
     }
 
     private void saveRoles() {
-        this.saveRole(RoleEnum.ADMIN);
-        this.saveRole(RoleEnum.USER);
+        this.saveRole(RoleEnum.ROLE_ADMIN);
+        this.saveRole(RoleEnum.ROLE_USER);
     }
 
     private void saveRole(RoleEnum role) {

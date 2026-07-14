@@ -28,7 +28,7 @@ public class UserService {
     public User createUser(RegisterRequestDTO registerRequestDTO, String encryptedPassword) {
         User user = userMapper.toUser(registerRequestDTO, encryptedPassword);
 
-        Role userRole = roleService.findByName(RoleEnum.USER);
+        Role userRole = roleService.findByName(RoleEnum.ROLE_USER);
         user.setRole(userRole);
 
         return userRepository.save(user);
